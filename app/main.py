@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException, status
 
+from app.config import load_settings
 from app.models import Item, ItemCreate
 
-app = FastAPI(title="My Python App", version="0.1.0")
+settings = load_settings()
+app = FastAPI(title=settings.app_name, version="0.1.0", debug=settings.debug)
 
 # In-memory store; swap for a real database later.
 _items: dict[int, Item] = {}
