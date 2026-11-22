@@ -27,3 +27,10 @@ def test_create_get_delete_item():
 def test_create_item_rejects_non_positive_price():
     resp = client.post("/items", json={"name": "Free", "price": 0})
     assert resp.status_code == 422
+
+
+def test_list_items_paginated():
+    for i in range(3):
+        client.post("/items", json={"name": f"Item {i}", "price": 1})
+    resp = client.get("/items?page=1&page_size=2")
+    assert resp.status_code == 200

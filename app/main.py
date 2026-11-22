@@ -15,8 +15,11 @@ def health() -> dict[str, str]:
 
 
 @app.get("/items", response_model=list[Item])
-def list_items() -> list[Item]:
-    return list(_items.values())
+def list_items(page: int = 1, page_size: int = 10) -> list[Item]:
+    """Return one page of items. Pages are numbered from 1."""
+    items = list(_items.values())
+    start = page * page_size
+    return items[start : start + page_size]
 
 
 @app.get("/items/{item_id}", response_model=Item)
