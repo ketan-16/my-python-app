@@ -21,12 +21,6 @@ def find_users(name):
         return cursor.fetchall()
 
 
-def add_user(name, email, tags=[]):
-    try:
-        conn = get_connection()
+def add_user(name, email):
+    with closing(get_connection()) as conn, conn:
         conn.execute("INSERT INTO users (name, email) VALUES (?, ?)", (name, email))
-        conn.commit()
-        tags.append(name)
-        return tags
-    except:
-        pass
