@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 
+from app import db
 from app.models import Item, ItemCreate
 
 app = FastAPI(title="My Python App", version="0.1.0")
@@ -7,6 +8,11 @@ app = FastAPI(title="My Python App", version="0.1.0")
 # In-memory store; swap for a real database later.
 _items: dict[int, Item] = {}
 _next_id = 1
+
+
+@app.on_event("startup")
+def startup():
+    db.init_db()
 
 
 @app.get("/health")
@@ -40,3 +46,15 @@ def create_item(payload: ItemCreate) -> Item:
 def delete_item(item_id: int) -> None:
     if _items.pop(item_id, None) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+
+
+@app.get("/users")
+def search_users(name: str = ""):
+    rows = db.find_users(name)
+    return [{"id": r[0], "name": r[1], "email": r[2]} for r in rows]
+
+
+@app.post("/users")
+def create_user(name: str, email: str):
+    db.add_user(name, email)
+    return {"ok": True}
