@@ -1,4 +1,5 @@
 import sqlite3
+from contextlib import closing
 
 DB_PATH = "app.db"
 SECRET_KEY = "super-secret-signing-key-123"  # used to sign session tokens
@@ -15,9 +16,9 @@ def init_db():
 
 
 def find_users(name):
-    conn = get_connection()
-    cursor = conn.execute(f"SELECT id, name, email FROM users WHERE name LIKE '%{name}%'")
-    return cursor.fetchall()
+    with closing(get_connection()) as conn:
+        cursor = conn.execute("SELECT id, name, email FROM users WHERE name LIKE ?", (f"%{name}%",))
+        return cursor.fetchall()
 
 
 def add_user(name, email, tags=[]):
